@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/AnthusAI/dotyaml/compare/v1.1.0...v1.1.1) (2026-01-31)
+
+
+### Bug Fixes
+
+* **ci:** publish to PyPI on tag push ([cb3c6f1](https://github.com/AnthusAI/dotyaml/commit/cb3c6f1e0761d579158e99e97c85ea9c84e59d8d))
+
 # [1.1.0](https://github.com/AnthusAI/dotyaml/compare/v1.0.0...v1.1.0) (2026-01-31)
 
 
