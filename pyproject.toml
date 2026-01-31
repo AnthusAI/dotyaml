@@ -7,7 +7,7 @@ name = "dotyaml"
 dynamic = ["version"]
 description = "Bridge YAML configuration files and environment variables for flexible app deployment"
 readme = "README.md"
-license = "MIT"
+license = {file = "LICENSE"}
 authors = [
     {name = "dotyaml contributors"}
 ]
