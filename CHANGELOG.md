@@ -1,3 +1,19 @@
+# [1.1.0](https://github.com/AnthusAI/dotyaml/compare/v1.0.0...v1.1.0) (2026-01-31)
+
+
+### Bug Fixes
+
+* restore working BDD tests ([dd4e173](https://github.com/AnthusAI/dotyaml/commit/dd4e1733a27e20714e446f1b719af8b6a4fc5610))
+* satisfy mypy on interpolation and loader ([4144a8b](https://github.com/AnthusAI/dotyaml/commit/4144a8b0a9d9c491ef96156ec4633797703e20ce))
+* use PEP 621 license table ([3041596](https://github.com/AnthusAI/dotyaml/commit/3041596b932d78ddb436d88994ba6c8e703e8972))
+
+
+### Features
+
+* **ci:** add python 3.9/3.10 test coverage ([9ac27aa](https://github.com/AnthusAI/dotyaml/commit/9ac27aa2833120ae0262b7addf5519a118af1963))
+* **config:** add multi-file yaml view ([a189ac7](https://github.com/AnthusAI/dotyaml/commit/a189ac7a55d3f27d034de658303aa90f1fd48980))
+* improve .env file discovery with multi-location search ([58d6029](https://github.com/AnthusAI/dotyaml/commit/58d60295e94fe8dbe5599f71ddf42266d39114a0))
+
 # 1.0.0 (2025-09-14)
 
 
