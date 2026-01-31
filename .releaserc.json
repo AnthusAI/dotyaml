@@ -14,7 +14,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "python -m build"
+        "prepareCmd": "python -c \"from pathlib import Path; import re; version='${nextRelease.version}'; path=Path('src/dotyaml/__init__.py'); content=path.read_text(); content=re.sub(r'^__version__ = .*$', f'__version__ = \\\"{version}\\\"', content, flags=re.M); path.write_text(content)\" && python -m build"
       }
     ],
     [
