@@ -39,10 +39,12 @@ class TestComprehensivePrecedence:
 
             # Create YAML that would try to set the same final env var
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 critical:
   setting: yaml_should_not_override_this
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
@@ -77,10 +79,12 @@ critical:
 
             # Create YAML that uses the env var
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 app:
   name: TestApp
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
@@ -113,18 +117,21 @@ app:
 
             # Create .env file
             env_file = temp_path / ".env"
-            env_file.write_text("""
+            env_file.write_text(
+                """
 # This should NOT override manual final env var
 APP_SCENARIO1_VALUE=dotenv_should_not_win
 # This should NOT override manual interpolation source
 INTERPOLATION_SOURCE=dotenv_should_not_win
 # This should be used since no manual override
 DOTENV_ONLY_VAR=dotenv_wins_here
-""")
+"""
+            )
 
             # Create YAML
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 scenario1:
   value: yaml_should_not_win
 scenario2:
@@ -133,7 +140,8 @@ scenario3:
   value: "{{ DOTENV_ONLY_VAR }}"
 scenario4:
   value: pure_yaml_value
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
@@ -179,10 +187,12 @@ scenario4:
 
             # Create YAML
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 test:
   manual_override: "{{ TEST_MANUAL_OVERRIDE }}"
-""")
+"""
+            )
 
             try:
                 # Create ConfigLoader with .env integration

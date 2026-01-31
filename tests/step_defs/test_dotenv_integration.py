@@ -37,16 +37,19 @@ class TestDotenvIntegration:
 
             # Create .env file
             env_file = temp_path / ".env"
-            env_file.write_text("""
+            env_file.write_text(
+                """
 DB_USERNAME=env_admin
 DB_PASSWORD=env_secret_password
 API_KEY=env_api_key_123
 TEST_SECRET=very_secret_value
-""")
+"""
+            )
 
             # Create YAML config file
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 database:
   host: localhost
   port: 5432
@@ -54,7 +57,8 @@ database:
 api:
   timeout: 30
   retries: 3
-""")
+"""
+            )
 
             # Change to temp directory so .env is found automatically
             original_cwd = os.getcwd()
@@ -126,11 +130,13 @@ api:
 
             # Create YAML config
             yaml_file = temp_path / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 database:
   host: localhost
   username: "{{ DB_USERNAME|default_user }}"
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
@@ -278,15 +284,18 @@ database:
 
             # Create .env file in the config directory
             env_file = config_dir / ".env"
-            env_file.write_text("""
+            env_file.write_text(
+                """
 CONFIG_DB_USER=config_dir_admin
 CONFIG_DB_PASS=config_dir_secret
 CONFIG_API_KEY=config_dir_api_123
-""")
+"""
+            )
 
             # Create YAML file in the same config directory
             yaml_file = config_dir / "app.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 database:
   username: "{{ CONFIG_DB_USER }}"
   password: "{{ CONFIG_DB_PASS }}"
@@ -294,7 +303,8 @@ database:
 api:
   key: "{{ CONFIG_API_KEY }}"
   timeout: 30
-""")
+"""
+            )
 
             # Important: Change to parent directory (not config dir)
             # This tests that .env is found in YAML directory, not CWD
@@ -337,10 +347,12 @@ api:
 
             # Create YAML file
             yaml_file = yaml_dir / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 test:
   value: "{{ PRIORITY_VAR }}"
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
@@ -368,18 +380,22 @@ test:
 
             # Create .env in subdirectory
             env_file = sub_dir / ".env"
-            env_file.write_text("""
+            env_file.write_text(
+                """
 LOADER_VAR1=loader_value1
 LOADER_VAR2=loader_value2
-""")
+"""
+            )
 
             # Create YAML in same subdirectory
             yaml_file = sub_dir / "config.yaml"
-            yaml_file.write_text("""
+            yaml_file.write_text(
+                """
 config:
   var1: "{{ LOADER_VAR1 }}"
   var2: "{{ LOADER_VAR2 }}"
-""")
+"""
+            )
 
             original_cwd = os.getcwd()
             try:
