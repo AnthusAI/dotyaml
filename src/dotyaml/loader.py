@@ -5,7 +5,7 @@ Core loading functionality for yamlenv
 import os
 import yaml
 from pathlib import Path
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, Iterable, List, Tuple
 
 try:
     from dotenv import load_dotenv
@@ -15,6 +15,93 @@ except ImportError:
 
 from .transformer import flatten_dict, unflatten_env_vars
 from .interpolation import interpolate_env_vars
+
+
+def deep_merge_dicts(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Deep-merge two dictionaries.
+
+    - Mapping values are merged recursively.
+    - Non-mapping values replace earlier values.
+    - Lists are treated as atomic values and replace earlier values.
+
+    :param base: Base mapping.
+    :type base: dict[str, Any]
+    :param override: Override mapping applied on top of base.
+    :type override: dict[str, Any]
+    :return: New mapping with overrides applied.
+    :rtype: dict[str, Any]
+    """
+    merged: Dict[str, Any] = dict(base)
+    for key, override_value in override.items():
+        base_value = merged.get(key)
+        if isinstance(base_value, dict) and isinstance(override_value, dict):
+            merged[key] = deep_merge_dicts(base_value, override_value)
+        else:
+            merged[key] = override_value
+    return merged
+
+
+def load_yaml(
+    yaml_path: Union[str, Path],
+    *,
+    dotenv_path: Optional[Union[str, Path]] = ".env",
+    load_dotenv_first: bool = True,
+) -> Dict[str, Any]:
+    """
+    Load YAML configuration from a file with environment interpolation.
+
+    This function does not set environment variables. It only returns the parsed mapping.
+
+    :param yaml_path: Path to YAML configuration file.
+    :type yaml_path: str or pathlib.Path
+    :param dotenv_path: Optional .env file to load first for interpolation.
+    :type dotenv_path: str or pathlib.Path or None
+    :param load_dotenv_first: Whether to load dotenv before parsing YAML.
+    :type load_dotenv_first: bool
+    :return: Parsed YAML mapping.
+    :rtype: dict[str, Any]
+    :raises ValueError: If YAML content is not a mapping/object.
+    """
+    loader = ConfigLoader(dotenv_path=dotenv_path, load_dotenv_first=load_dotenv_first)
+    data = loader.load_from_yaml(yaml_path)
+    if not isinstance(data, dict):
+        raise ValueError("YAML configuration must be a mapping/object")
+    return data
+
+
+def load_yaml_view(
+    yaml_paths: Iterable[Union[str, Path]],
+    *,
+    dotenv_path: Optional[Union[str, Path]] = ".env",
+    load_dotenv_first: bool = True,
+) -> Dict[str, Any]:
+    """
+    Load and compose multiple YAML configuration files into a single configuration view.
+
+    Files are merged in order. Later files override earlier files using :func:`deep_merge_dicts`.
+
+    :param yaml_paths: Iterable of YAML file paths.
+    :type yaml_paths: Iterable[str | pathlib.Path]
+    :param dotenv_path: Optional .env file to load first for interpolation.
+    :type dotenv_path: str or pathlib.Path or None
+    :param load_dotenv_first: Whether to load dotenv before parsing YAML.
+    :type load_dotenv_first: bool
+    :return: Composed YAML mapping.
+    :rtype: dict[str, Any]
+    :raises FileNotFoundError: If any referenced file does not exist.
+    :raises ValueError: If any YAML file is not a mapping/object.
+    """
+    paths: List[Path] = [Path(path) for path in yaml_paths]
+    for path in paths:
+        if not path.is_file():
+            raise FileNotFoundError(f"YAML file not found: {path}")
+
+    composed: Dict[str, Any] = {}
+    for path in paths:
+        loaded = load_yaml(path, dotenv_path=dotenv_path, load_dotenv_first=load_dotenv_first)
+        composed = deep_merge_dicts(composed, loaded)
+    return composed
 
 
 def load_config(
@@ -164,6 +251,23 @@ class ConfigLoader:
             yaml_data = interpolate_env_vars(yaml_data)
 
         return yaml_data or {}
+
+    def load_view(self, yaml_paths: Iterable[Union[str, Path]]) -> Dict[str, Any]:
+        """
+        Load and deep-merge multiple YAML files into a single configuration view.
+
+        :param yaml_paths: Iterable of YAML file paths.
+        :type yaml_paths: Iterable[str | pathlib.Path]
+        :return: Composed configuration mapping.
+        :rtype: dict[str, Any]
+        """
+        composed: Dict[str, Any] = {}
+        for path in yaml_paths:
+            data = self.load_from_yaml(path)
+            if not isinstance(data, dict):
+                raise ValueError("YAML configuration must be a mapping/object")
+            composed = deep_merge_dicts(composed, data)
+        return composed
 
     def load_from_env(self) -> Dict[str, Any]:
         """Load configuration from environment variables"""

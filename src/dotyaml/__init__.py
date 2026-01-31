@@ -8,7 +8,7 @@ or environment variables, providing maximum deployment flexibility.
 __version__ = "0.1.3"
 
 # Main API - keep it simple like python-dotenv
-from .loader import load_config, ConfigLoader
+from .loader import ConfigLoader, load_config, load_yaml, load_yaml_view
 from .interpolation import interpolate_env_vars
 
-__all__ = ["load_config", "ConfigLoader", "interpolate_env_vars"]
+__all__ = ["ConfigLoader", "interpolate_env_vars", "load_config", "load_yaml", "load_yaml_view"]
