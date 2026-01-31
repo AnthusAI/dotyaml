@@ -158,21 +158,22 @@ def load_config(
 
         if yaml_data:
             # Interpolate environment variables in the YAML data
-            yaml_data = interpolate_env_vars(yaml_data)
+            interpolated_data = interpolate_env_vars(yaml_data)
 
-            # Transform nested structure to flat env var names
-            flat_config = flatten_dict(yaml_data, prefix)
+            if isinstance(interpolated_data, dict):
+                # Transform nested structure to flat env var names
+                flat_config = flatten_dict(interpolated_data, prefix)
 
-            # Set environment variables with precedence handling
-            for key, value in flat_config.items():
-                # Check if env var already exists and override is False
-                if not override and key in os.environ:
-                    # Keep existing env var, but track it in config
-                    config[key] = os.environ[key]
-                else:
-                    # Set new env var
-                    os.environ[key] = value
-                    config[key] = value
+                # Set environment variables with precedence handling
+                for key, value in flat_config.items():
+                    # Check if env var already exists and override is False
+                    if not override and key in os.environ:
+                        # Keep existing env var, but track it in config
+                        config[key] = os.environ[key]
+                    else:
+                        # Set new env var
+                        os.environ[key] = value
+                        config[key] = value
 
     return config
 

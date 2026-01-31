@@ -49,7 +49,7 @@ def _interpolate_string(text: str) -> str:
     # Pattern to match {{ VAR_NAME }} or {{ VAR_NAME|default }}
     pattern = r'\{\{\s*([A-Z_][A-Z0-9_]*)\s*(?:\|\s*([^}]*?))?\s*\}\}'
 
-    def replace_match(match):
+    def replace_match(match: re.Match[str]) -> str:
         env_var = match.group(1)
         default_value = match.group(2)
 
