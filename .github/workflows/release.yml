@@ -80,6 +80,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: semantic-release
 
+    - name: Build package for PyPI
+      if: success()
+      run: python -m build
+
     - name: Publish to PyPI
       if: success()
       uses: pypa/gh-action-pypi-publish@release/v1
