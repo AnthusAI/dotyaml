@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any, Union, Iterable, List, Tuple
 
 try:
     from dotenv import load_dotenv
+
     DOTENV_AVAILABLE = True
 except ImportError:
     DOTENV_AVAILABLE = False
@@ -99,7 +100,9 @@ def load_yaml_view(
 
     composed: Dict[str, Any] = {}
     for path in paths:
-        loaded = load_yaml(path, dotenv_path=dotenv_path, load_dotenv_first=load_dotenv_first)
+        loaded = load_yaml(
+            path, dotenv_path=dotenv_path, load_dotenv_first=load_dotenv_first
+        )
         composed = deep_merge_dicts(composed, loaded)
     return composed
 

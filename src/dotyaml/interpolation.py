@@ -7,7 +7,9 @@ import re
 from typing import Any, Dict, Union
 
 
-def interpolate_env_vars(data: Union[str, Dict[str, Any], Any]) -> Union[str, Dict[str, Any], Any]:
+def interpolate_env_vars(
+    data: Union[str, Dict[str, Any], Any],
+) -> Union[str, Dict[str, Any], Any]:
     """
     Recursively interpolate environment variables in YAML data using Jinja-like syntax.
 
@@ -47,7 +49,7 @@ def _interpolate_string(text: str) -> str:
         ValueError: If a required environment variable is not found
     """
     # Pattern to match {{ VAR_NAME }} or {{ VAR_NAME|default }}
-    pattern = r'\{\{\s*([A-Z_][A-Z0-9_]*)\s*(?:\|\s*([^}]*?))?\s*\}\}'
+    pattern = r"\{\{\s*([A-Z_][A-Z0-9_]*)\s*(?:\|\s*([^}]*?))?\s*\}\}"
 
     def replace_match(match: re.Match[str]) -> str:
         env_var = match.group(1)

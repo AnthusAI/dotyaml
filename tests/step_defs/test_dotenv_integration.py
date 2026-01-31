@@ -16,8 +16,14 @@ class TestDotenvIntegration:
         """Set up test environment"""
         # Clean up any existing test env vars
         test_vars = [
-            "DB_USERNAME", "DB_PASSWORD", "API_KEY", "SECRET_TOKEN",
-            "APP_DB_USERNAME", "APP_DB_PASSWORD", "APP_API_KEY", "TEST_SECRET"
+            "DB_USERNAME",
+            "DB_PASSWORD",
+            "API_KEY",
+            "SECRET_TOKEN",
+            "APP_DB_USERNAME",
+            "APP_DB_PASSWORD",
+            "APP_API_KEY",
+            "TEST_SECRET",
         ]
         for var in test_vars:
             if var in os.environ:
@@ -56,17 +62,17 @@ api:
                 os.chdir(temp_dir)
 
                 # Load config - should automatically load .env
-                config = load_config('config.yaml', prefix='APP')
+                config = load_config("config.yaml", prefix="APP")
 
                 # Verify .env variables were loaded
-                assert os.getenv('DB_USERNAME') == 'env_admin'
-                assert os.getenv('DB_PASSWORD') == 'env_secret_password'
-                assert os.getenv('API_KEY') == 'env_api_key_123'
-                assert os.getenv('TEST_SECRET') == 'very_secret_value'
+                assert os.getenv("DB_USERNAME") == "env_admin"
+                assert os.getenv("DB_PASSWORD") == "env_secret_password"
+                assert os.getenv("API_KEY") == "env_api_key_123"
+                assert os.getenv("TEST_SECRET") == "very_secret_value"
 
                 # Verify YAML config was still processed
-                assert config['APP_DATABASE_HOST'] == 'localhost'
-                assert config['APP_DATABASE_PORT'] == '5432'
+                assert config["APP_DATABASE_HOST"] == "localhost"
+                assert config["APP_DATABASE_PORT"] == "5432"
 
             finally:
                 os.chdir(original_cwd)
@@ -79,7 +85,7 @@ CUSTOM_USERNAME=custom_admin
 CUSTOM_PASSWORD=custom_secret
 CUSTOM_API_KEY=custom_key_456
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
             f.write(env_content)
             custom_env_path = f.name
 
@@ -91,18 +97,18 @@ database:
 api:
   key: "{{ CUSTOM_API_KEY }}"
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             yaml_path = f.name
 
         try:
             # Load with custom .env path
-            config = load_config(yaml_path, prefix='APP', dotenv_path=custom_env_path)
+            config = load_config(yaml_path, prefix="APP", dotenv_path=custom_env_path)
 
             # Verify custom .env was loaded and interpolated
-            assert config['APP_DATABASE_USERNAME'] == 'custom_admin'
-            assert config['APP_DATABASE_PASSWORD'] == 'custom_secret'
-            assert config['APP_API_KEY'] == 'custom_key_456'
+            assert config["APP_DATABASE_USERNAME"] == "custom_admin"
+            assert config["APP_DATABASE_PASSWORD"] == "custom_secret"
+            assert config["APP_API_KEY"] == "custom_key_456"
 
         finally:
             Path(yaml_path).unlink()
@@ -131,11 +137,13 @@ database:
                 os.chdir(temp_dir)
 
                 # Load config with dotenv disabled
-                config = load_config('config.yaml', prefix='APP', load_dotenv_first=False)
+                config = load_config(
+                    "config.yaml", prefix="APP", load_dotenv_first=False
+                )
 
                 # Verify .env was NOT loaded
-                assert os.getenv('SHOULD_NOT_LOAD') is None
-                assert config['APP_DATABASE_USERNAME'] == 'default_user'  # used default
+                assert os.getenv("SHOULD_NOT_LOAD") is None
+                assert config["APP_DATABASE_USERNAME"] == "default_user"  # used default
 
             finally:
                 os.chdir(original_cwd)
@@ -148,7 +156,7 @@ DB_USERNAME=dotenv_user
 DB_PASSWORD=dotenv_password
 API_ENDPOINT=https://api.production.com
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
             f.write(env_content)
             env_path = f.name
 
@@ -162,19 +170,23 @@ api:
   endpoint: "{{ API_ENDPOINT|https://api.dev.com }}"
   timeout: 30
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             yaml_path = f.name
 
         try:
             # Load configuration
-            config = load_config(yaml_path, prefix='APP', dotenv_path=env_path)
+            config = load_config(yaml_path, prefix="APP", dotenv_path=env_path)
 
             # Verify .env values were used instead of YAML defaults
-            assert config['APP_DATABASE_USERNAME'] == 'dotenv_user'  # from .env
-            assert config['APP_DATABASE_PASSWORD'] == 'dotenv_password'  # from .env
-            assert config['APP_DATABASE_HOST'] == 'localhost'  # YAML default (no .env value)
-            assert config['APP_API_ENDPOINT'] == 'https://api.production.com'  # from .env
+            assert config["APP_DATABASE_USERNAME"] == "dotenv_user"  # from .env
+            assert config["APP_DATABASE_PASSWORD"] == "dotenv_password"  # from .env
+            assert (
+                config["APP_DATABASE_HOST"] == "localhost"
+            )  # YAML default (no .env value)
+            assert (
+                config["APP_API_ENDPOINT"] == "https://api.production.com"
+            )  # from .env
 
         finally:
             Path(yaml_path).unlink()
@@ -183,14 +195,14 @@ api:
     def test_existing_env_vars_take_precedence_over_dotenv(self):
         """Test that existing environment variables take precedence over .env"""
         # Set existing environment variable
-        os.environ['EXISTING_VAR'] = 'existing_value'
+        os.environ["EXISTING_VAR"] = "existing_value"
 
         # Create .env file with same variable
         env_content = """
 EXISTING_VAR=dotenv_value
 NEW_VAR=new_value
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
             f.write(env_content)
             env_path = f.name
 
@@ -199,22 +211,24 @@ config:
   existing: "{{ EXISTING_VAR }}"
   new: "{{ NEW_VAR }}"
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             yaml_path = f.name
 
         try:
-            config = load_config(yaml_path, prefix='APP', dotenv_path=env_path)
+            config = load_config(yaml_path, prefix="APP", dotenv_path=env_path)
 
             # Verify existing env var takes precedence
-            assert config['APP_CONFIG_EXISTING'] == 'existing_value'  # from existing env
-            assert config['APP_CONFIG_NEW'] == 'new_value'  # from .env
+            assert (
+                config["APP_CONFIG_EXISTING"] == "existing_value"
+            )  # from existing env
+            assert config["APP_CONFIG_NEW"] == "new_value"  # from .env
 
         finally:
             Path(yaml_path).unlink()
             Path(env_path).unlink()
-            if 'EXISTING_VAR' in os.environ:
-                del os.environ['EXISTING_VAR']
+            if "EXISTING_VAR" in os.environ:
+                del os.environ["EXISTING_VAR"]
 
     def test_config_loader_with_dotenv(self):
         """Test ConfigLoader with .env integration"""
@@ -223,7 +237,7 @@ config:
 LOADER_DB_USER=loader_admin
 LOADER_DB_PASS=loader_secret
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
             f.write(env_content)
             env_path = f.name
 
@@ -233,20 +247,20 @@ database:
   password: "{{ LOADER_DB_PASS }}"
   host: localhost
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             yaml_path = f.name
 
         try:
             # Create ConfigLoader with custom .env path
-            loader = ConfigLoader(prefix='TEST', dotenv_path=env_path)
+            loader = ConfigLoader(prefix="TEST", dotenv_path=env_path)
 
             # Load YAML config
             config = loader.load_from_yaml(yaml_path)
 
             # Verify .env variables were loaded and interpolated
-            assert config['database']['username'] == 'loader_admin'
-            assert config['database']['password'] == 'loader_secret'
+            assert config["database"]["username"] == "loader_admin"
+            assert config["database"]["password"] == "loader_secret"
 
         finally:
             Path(yaml_path).unlink()
@@ -289,16 +303,16 @@ api:
                 os.chdir(temp_dir)  # CWD is parent of config dir
 
                 # Load config using relative path to YAML in subdirectory
-                config = load_config('config/app.yaml', prefix='TEST')
+                config = load_config("config/app.yaml", prefix="TEST")
 
                 # Verify .env from YAML directory was loaded and interpolated
-                assert config['TEST_DATABASE_USERNAME'] == 'config_dir_admin'
-                assert config['TEST_DATABASE_PASSWORD'] == 'config_dir_secret'
-                assert config['TEST_API_KEY'] == 'config_dir_api_123'
+                assert config["TEST_DATABASE_USERNAME"] == "config_dir_admin"
+                assert config["TEST_DATABASE_PASSWORD"] == "config_dir_secret"
+                assert config["TEST_API_KEY"] == "config_dir_api_123"
 
                 # Verify environment variables were set
-                assert os.getenv('CONFIG_DB_USER') == 'config_dir_admin'
-                assert os.getenv('CONFIG_DB_PASS') == 'config_dir_secret'
+                assert os.getenv("CONFIG_DB_USER") == "config_dir_admin"
+                assert os.getenv("CONFIG_DB_PASS") == "config_dir_secret"
 
             finally:
                 os.chdir(original_cwd)
@@ -333,11 +347,11 @@ test:
                 os.chdir(temp_dir)
 
                 # Load config - should use .env from CWD, not YAML directory
-                config = load_config('configs/config.yaml', prefix='PRIORITY')
+                config = load_config("configs/config.yaml", prefix="PRIORITY")
 
                 # Verify CWD .env took precedence
-                assert config['PRIORITY_TEST_VALUE'] == 'from_root'
-                assert os.getenv('PRIORITY_VAR') == 'from_root'
+                assert config["PRIORITY_TEST_VALUE"] == "from_root"
+                assert os.getenv("PRIORITY_VAR") == "from_root"
 
             finally:
                 os.chdir(original_cwd)
@@ -372,12 +386,12 @@ config:
                 os.chdir(temp_dir)  # CWD is parent directory
 
                 # Create ConfigLoader - should find .env in YAML directory
-                loader = ConfigLoader(prefix='LOADER')
-                config_data = loader.load_from_yaml('subdir/config.yaml')
+                loader = ConfigLoader(prefix="LOADER")
+                config_data = loader.load_from_yaml("subdir/config.yaml")
 
                 # Verify .env was loaded and interpolated
-                assert config_data['config']['var1'] == 'loader_value1'
-                assert config_data['config']['var2'] == 'loader_value2'
+                assert config_data["config"]["var1"] == "loader_value1"
+                assert config_data["config"]["var2"] == "loader_value2"
 
             finally:
                 os.chdir(original_cwd)
@@ -396,7 +410,7 @@ JWT_SECRET=jwt_signing_secret_xyz789
 STRIPE_SECRET_KEY=sk_test_stripe_key_123
 SENDGRID_API_KEY=SG.sendgrid_key_456
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.env', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
             f.write(env_content)
             env_path = f.name
 
@@ -433,30 +447,35 @@ services:
   sendgrid:
     api_key: "{{ SENDGRID_API_KEY }}"
 """
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             yaml_path = f.name
 
         try:
             # Load configuration - this is what would happen in production
-            config = load_config(yaml_path, prefix='MYAPP', dotenv_path=env_path)
+            config = load_config(yaml_path, prefix="MYAPP", dotenv_path=env_path)
 
             # Verify secrets were loaded from .env and applied
-            assert config['MYAPP_DATABASE_USERNAME'] == 'production_admin'
-            assert config['MYAPP_DATABASE_PASSWORD'] == 'super_secret_password_123!'
-            assert config['MYAPP_API_SECRET_KEY'] == 'sk_live_abc123def456ghi789'
-            assert config['MYAPP_SERVICES_STRIPE_SECRET_KEY'] == 'sk_test_stripe_key_123'
+            assert config["MYAPP_DATABASE_USERNAME"] == "production_admin"
+            assert config["MYAPP_DATABASE_PASSWORD"] == "super_secret_password_123!"
+            assert config["MYAPP_API_SECRET_KEY"] == "sk_live_abc123def456ghi789"
+            assert (
+                config["MYAPP_SERVICES_STRIPE_SECRET_KEY"] == "sk_test_stripe_key_123"
+            )
 
             # Verify non-secret config from YAML
-            assert config['MYAPP_APP_NAME'] == 'MyApp'
-            assert config['MYAPP_DATABASE_HOST'] == 'localhost'  # default value
-            assert config['MYAPP_DATABASE_NAME'] == 'myapp_production'  # default value
-            assert config['MYAPP_DATABASE_SSL'] == 'true'
-            assert config['MYAPP_SERVICES_STRIPE_WEBHOOK_SECRET'] == 'default_webhook_secret'  # default
+            assert config["MYAPP_APP_NAME"] == "MyApp"
+            assert config["MYAPP_DATABASE_HOST"] == "localhost"  # default value
+            assert config["MYAPP_DATABASE_NAME"] == "myapp_production"  # default value
+            assert config["MYAPP_DATABASE_SSL"] == "true"
+            assert (
+                config["MYAPP_SERVICES_STRIPE_WEBHOOK_SECRET"]
+                == "default_webhook_secret"
+            )  # default
 
             # Verify environment variables are available to the application
-            assert os.getenv('MYAPP_DATABASE_USERNAME') == 'production_admin'
-            assert os.getenv('MYAPP_API_SECRET_KEY') == 'sk_live_abc123def456ghi789'
+            assert os.getenv("MYAPP_DATABASE_USERNAME") == "production_admin"
+            assert os.getenv("MYAPP_API_SECRET_KEY") == "sk_live_abc123def456ghi789"
 
         finally:
             Path(yaml_path).unlink()
@@ -465,19 +484,40 @@ services:
     def teardown_method(self):
         """Clean up test environment"""
         test_vars = [
-            "DB_USERNAME", "DB_PASSWORD", "API_KEY", "SECRET_TOKEN", "TEST_SECRET",
-            "APP_DB_USERNAME", "APP_DB_PASSWORD", "APP_API_KEY",
-            "CUSTOM_USERNAME", "CUSTOM_PASSWORD", "CUSTOM_API_KEY",
-            "SHOULD_NOT_LOAD", "EXISTING_VAR", "NEW_VAR",
-            "LOADER_DB_USER", "LOADER_DB_PASS", "DB_HOST", "DB_NAME",
-            "API_SECRET_KEY", "JWT_SECRET", "STRIPE_SECRET_KEY", "SENDGRID_API_KEY",
-            "STRIPE_WEBHOOK_SECRET", "CONFIG_DB_USER", "CONFIG_DB_PASS", "CONFIG_API_KEY",
-            "PRIORITY_VAR", "LOADER_VAR1", "LOADER_VAR2"
+            "DB_USERNAME",
+            "DB_PASSWORD",
+            "API_KEY",
+            "SECRET_TOKEN",
+            "TEST_SECRET",
+            "APP_DB_USERNAME",
+            "APP_DB_PASSWORD",
+            "APP_API_KEY",
+            "CUSTOM_USERNAME",
+            "CUSTOM_PASSWORD",
+            "CUSTOM_API_KEY",
+            "SHOULD_NOT_LOAD",
+            "EXISTING_VAR",
+            "NEW_VAR",
+            "LOADER_DB_USER",
+            "LOADER_DB_PASS",
+            "DB_HOST",
+            "DB_NAME",
+            "API_SECRET_KEY",
+            "JWT_SECRET",
+            "STRIPE_SECRET_KEY",
+            "SENDGRID_API_KEY",
+            "STRIPE_WEBHOOK_SECRET",
+            "CONFIG_DB_USER",
+            "CONFIG_DB_PASS",
+            "CONFIG_API_KEY",
+            "PRIORITY_VAR",
+            "LOADER_VAR1",
+            "LOADER_VAR2",
         ]
 
         # Also clean up any MYAPP_ and APP_ prefixed vars
         all_env_vars = list(os.environ.keys())
         for var in all_env_vars:
-            if var.startswith(('MYAPP_', 'APP_', 'TEST_')) or var in test_vars:
+            if var.startswith(("MYAPP_", "APP_", "TEST_")) or var in test_vars:
                 if var in os.environ:
                     del os.environ[var]

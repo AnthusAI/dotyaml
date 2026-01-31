@@ -11,4 +11,10 @@ __version__ = "0.1.3"
 from .loader import ConfigLoader, load_config, load_yaml, load_yaml_view
 from .interpolation import interpolate_env_vars
 
-__all__ = ["ConfigLoader", "interpolate_env_vars", "load_config", "load_yaml", "load_yaml_view"]
+__all__ = [
+    "ConfigLoader",
+    "interpolate_env_vars",
+    "load_config",
+    "load_yaml",
+    "load_yaml_view",
+]

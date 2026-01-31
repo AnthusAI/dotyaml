@@ -45,4 +45,3 @@ def test_load_yaml_view_rejects_missing_file(tmp_path: Path) -> None:
     missing = tmp_path / "missing.yml"
     with pytest.raises(FileNotFoundError):
         load_yaml_view([missing], load_dotenv_first=False, dotenv_path=None)
-
